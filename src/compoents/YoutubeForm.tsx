@@ -28,7 +28,17 @@ const YoutubeForm = () => {
       <input
         type="email"
         placeholder="Email"
-        {...register("email", { required: "email is required" })}
+        {...register("email", {
+          required: "email is required",
+          validate: {
+            EmailFormat: (value) => {
+              return (
+                value.endsWith("fusemachines.com") ||
+                "email should be of example@fusemachines.com"
+              );
+            },
+          },
+        })}
         className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
       />
       <p className="text-red-600">{errors.email?.message}</p>
