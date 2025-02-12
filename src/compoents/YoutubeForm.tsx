@@ -5,8 +5,26 @@ const YoutubeForm = () => {
     username: string;
     email: string;
     channel: string;
+
+    // Nested Objects
+    social: {
+      twitter: string;
+      facebook: string;
+    };
+    phoneNumbers: string[];
   };
-  const form = useForm<FormData>();
+  const form = useForm<FormData>({
+    defaultValues: {
+      username: "Hari",
+      email: "",
+      channel: "",
+      social: {
+        twitter: "",
+        facebook: "",
+      },
+      phoneNumbers: ["", ""],
+    },
+  });
   const { register, control, handleSubmit, formState } = form;
   const { errors } = formState;
   const onSubmit = (data: FormData) => {
@@ -46,6 +64,30 @@ const YoutubeForm = () => {
         type="text"
         {...register("channel", { required: "channel is required" })}
         placeholder="Channel"
+        className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
+      />
+      <input
+        type="text"
+        {...register("social.twitter")}
+        placeholder="twitter"
+        className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
+      />
+      <input
+        type="text"
+        {...register("social.facebook")}
+        placeholder="facebook"
+        className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
+      />
+      <input
+        type="text"
+        {...register("phoneNumbers.0")}
+        placeholder="Phone numbers1"
+        className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
+      />
+      <input
+        type="text"
+        {...register("phoneNumbers.1")}
+        placeholder="Phone numbers2"
         className="w-full mb-4 p-2 bg-neutral-800 border border-neutral-700 text-white rounded"
       />
       <p className="text-red-600">{errors.channel?.message}</p>
