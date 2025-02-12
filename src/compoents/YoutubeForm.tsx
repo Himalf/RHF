@@ -12,13 +12,13 @@ const YoutubeForm = () => {
       twitter: string;
       facebook: string;
     };
-    // Array fields for phone numbers
+    // Array fields for static phone numbers
     phoneNumbers: string[];
+    // Array fields for dynamic phone numbers with objects
     phNumbers: {
       number: string;
     }[];
-
-    // To handle numeic and Date values"
+    // Numeric and Date fields
     age: number;
     dob: Date;
   };
@@ -26,35 +26,64 @@ const YoutubeForm = () => {
   // Initialize the form with default values using React Hook Form
   const form = useForm<FormData>({
     defaultValues: {
-      username: "Hari",
+      username: "Hari", // Pre-filled username
       email: "",
       channel: "",
       social: {
         twitter: "",
         facebook: "",
       },
-      phoneNumbers: ["", ""], // Two phone number fields by default
+      phoneNumbers: ["", ""], // Two static phone number fields by default
       phNumbers: [{ number: "" }], // One dynamic phone number field by default
       age: 18,
-      dob: new Date(),
+      dob: new Date(), // Default to current date
     },
   });
 
   // Destructuring methods from useForm and useFieldArray hooks
-  const { register, control, handleSubmit, formState, watch } = form;
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState,
+    watch,
+    getValues,
+    setValue,
+  } = form;
   const { errors } = formState;
   const { fields, append, remove } = useFieldArray({
-    name: "phNumbers",
+    name: "phNumbers", // Managing dynamic phone numbers
     control,
   });
 
-  //   Watch Field Values
-  //   const watchUserName = watch("username");
+  // Watch all field values for debugging or dynamic rendering
+  const watchFieldValue = watch();
 
-  const watchValues = watch(["username", "email", "channel"]);
   // Handle form submission
   const onSubmit = (data: FormData) => {
     console.log(data);
+  };
+
+  //   get values method
+  const handleGetValues = () => {
+    window.confirm(JSON.stringify(getValues()));
+    return (
+      <div className="w-screen h-screen bg-red-800 text-white">
+        GetValues: {JSON.stringify(getValues())}
+      </div>
+    );
+  };
+  const handleSetValues = () => {
+    setValue("username", "Ramlal");
+    setValue("email", "ram@fusemachines.com");
+    setValue("channel", "Ram's Channel");
+    setValue("social.twitter", "@ramlal");
+    setValue("social.facebook", "ramlal.fb");
+    setValue("phoneNumbers.0", "1234567890");
+    setValue("phoneNumbers.1", "0987654321");
+    setValue("phNumbers", [{ number: "1111111111" }, { number: "2222222222" }]);
+    setValue("age", 25);
+    setValue("dob", new Date("2000-01-01"));
   };
 
   return (
@@ -63,7 +92,9 @@ const YoutubeForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      <div className="mb-4">Values : {watchValues}</div>
+      {/* Displaying watched field values for debugging */}
+      {/* <div className="mb-4">Values : {JSON.stringify(watchFieldValue)}</div> */}
+
       {/* Username Field */}
       <input
         type="text"
@@ -72,6 +103,7 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.username?.message}</p>
+
       {/* Email Field with custom validation */}
       <input
         type="email"
@@ -80,6 +112,7 @@ const YoutubeForm = () => {
           required: "Email is required",
           validate: {
             EmailFormat: (value) => {
+              // Custom validation to allow only specific domain
               return (
                 value.endsWith("fusemachines.com") ||
                 "Email should be of example@fusemachines.com"
@@ -90,6 +123,7 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.email?.message}</p>
+
       {/* Channel Field */}
       <input
         type="text"
@@ -98,6 +132,7 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.channel?.message}</p>
+
       {/* Social Media Fields */}
       <input
         type="text"
@@ -111,6 +146,7 @@ const YoutubeForm = () => {
         placeholder="Facebook"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
+
       {/* Static Phone Numbers */}
       <input
         type="text"
@@ -124,6 +160,7 @@ const YoutubeForm = () => {
         placeholder="Phone Number 2"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
+
       {/* Dynamic Phone Numbers */}
       <div>
         <label className="block text-black mb-2">List of phone numbers</label>
@@ -155,25 +192,30 @@ const YoutubeForm = () => {
           Add
         </button>
       </div>
+
       {/* Numeric and date values */}
       <input
         type="number"
         {...register("age", {
           valueAsNumber: true,
-          validate: {},
-          required: "age is required",
+          required: "Age is required",
         })}
         placeholder="Age"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
-      <p className="text-red-600">{errors.channel?.message}</p>
+      <p className="text-red-600">{errors.age?.message}</p>
+
       <input
         type="date"
-        {...register("dob", { valueAsDate: true, required: "dob is required" })}
-        placeholder="dob"
+        {...register("dob", {
+          //   valueAsDate: true,
+          required: "Date of Birth is required",
+        })}
+        placeholder="Date of Birth"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
-      <p className="text-red-600">{errors.channel?.message}</p>
+      <p className="text-red-600">{errors.dob?.message}</p>
+
       {/* Submit Button */}
       <button
         type="submit"
@@ -181,6 +223,21 @@ const YoutubeForm = () => {
       >
         Submit
       </button>
+      <button
+        type="button"
+        className="w-full p-2 bg-blue-600 text-white rounded mt-4"
+        onClick={handleGetValues}
+      >
+        Get Values
+      </button>
+      <button
+        type="button"
+        className="w-full p-2 bg-blue-600 text-white rounded mt-4"
+        onClick={handleSetValues}
+      >
+        Set Values
+      </button>
+
       {/* React Hook Form DevTool for debugging */}
       <DevTool control={control} />
     </form>
