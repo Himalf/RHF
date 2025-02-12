@@ -41,13 +41,17 @@ const YoutubeForm = () => {
   });
 
   // Destructuring methods from useForm and useFieldArray hooks
-  const { register, control, handleSubmit, formState } = form;
+  const { register, control, handleSubmit, formState, watch } = form;
   const { errors } = formState;
   const { fields, append, remove } = useFieldArray({
     name: "phNumbers",
     control,
   });
 
+  //   Watch Field Values
+  //   const watchUserName = watch("username");
+
+  const watchValues = watch(["username", "email", "channel"]);
   // Handle form submission
   const onSubmit = (data: FormData) => {
     console.log(data);
@@ -59,6 +63,7 @@ const YoutubeForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
+      <div className="mb-4">Values : {watchValues}</div>
       {/* Username Field */}
       <input
         type="text"
@@ -67,7 +72,6 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.username?.message}</p>
-
       {/* Email Field with custom validation */}
       <input
         type="email"
@@ -86,7 +90,6 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.email?.message}</p>
-
       {/* Channel Field */}
       <input
         type="text"
@@ -95,7 +98,6 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.channel?.message}</p>
-
       {/* Social Media Fields */}
       <input
         type="text"
@@ -109,7 +111,6 @@ const YoutubeForm = () => {
         placeholder="Facebook"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
-
       {/* Static Phone Numbers */}
       <input
         type="text"
@@ -123,7 +124,6 @@ const YoutubeForm = () => {
         placeholder="Phone Number 2"
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
-
       {/* Dynamic Phone Numbers */}
       <div>
         <label className="block text-black mb-2">List of phone numbers</label>
@@ -174,7 +174,6 @@ const YoutubeForm = () => {
         className="w-full mb-4 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
       />
       <p className="text-red-600">{errors.channel?.message}</p>
-
       {/* Submit Button */}
       <button
         type="submit"
@@ -182,7 +181,6 @@ const YoutubeForm = () => {
       >
         Submit
       </button>
-
       {/* React Hook Form DevTool for debugging */}
       <DevTool control={control} />
     </form>
