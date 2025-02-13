@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
-
+import { useEffect } from "react";
+import * as yup from "yup";
 const YoutubeForm = () => {
   // Define the form data structure using TypeScript interface
   type FormData = {
@@ -49,8 +50,20 @@ const YoutubeForm = () => {
     watch,
     getValues,
     setValue,
+    reset,
   } = form;
-  const { errors } = formState;
+  const {
+    errors,
+    isDirty,
+    isSubmitted,
+    isSubmitting,
+    isSubmitSuccessful,
+    submitCount,
+  } = formState;
+  console.log(isSubmitting);
+  console.log(isSubmitted, "issubmitted");
+  console.log(isSubmitSuccessful, "success");
+  console.log(submitCount, "count ");
   const { fields, append, remove } = useFieldArray({
     name: "phNumbers", // Managing dynamic phone numbers
     control,
@@ -86,6 +99,13 @@ const YoutubeForm = () => {
     setValue("dob", new Date("2000-01-01"));
   };
 
+  // Reset Method
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  });
+
   return (
     <form
       className="max-w-md mx-auto my-20 p-6 bg-white rounded-lg shadow-lg"
@@ -111,12 +131,20 @@ const YoutubeForm = () => {
         {...register("email", {
           required: "Email is required",
           validate: {
-            EmailFormat: (value) => {
-              // Custom validation to allow only specific domain
-              return (
-                value.endsWith("fusemachines.com") ||
-                "Email should be of example@fusemachines.com"
+            // EmailFormat: (value) => {
+            //   // Custom validation to allow only specific domain
+            //   return (
+            //     value.endsWith("fusemachines.com") ||
+            //     "Email should be of example@fusemachines.com"
+            //   );
+            // },
+
+            CheckEmail: async (value) => {
+              const response = await fetch(
+                `https://jsonplaceholder.typicode.com/users?email=${value}`
               );
+              const data = await response.json();
+              return data.length == 0 || "Email already exists";
             },
           },
         })}
@@ -220,8 +248,18 @@ const YoutubeForm = () => {
       <button
         type="submit"
         className="w-full p-2 bg-blue-600 text-white rounded mt-4"
+        // disabled={!isSubmitting}
       >
         Submit
+      </button>
+      <button
+        type="button"
+        className="w-full p-2 bg-blue-600 text-white rounded mt-4"
+        onClick={() => {
+          reset();
+        }}
+      >
+        Reset
       </button>
       <button
         type="button"
