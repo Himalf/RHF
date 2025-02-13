@@ -1,48 +1,38 @@
 import React from "react";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import axios from "axios";
 import { DevTool } from "@hookform/devtools";
 
-// Form Data Structure
-type FormData = {
-  eventName: string;
-  organizerEmail: string;
-  attendees: {
-    name: string;
-    age: number;
-  }[];
-};
-
-// Validation Schema
-const schema = yup.object().shape({
-  eventName: yup.string().required("Event name is required"),
-  organizerEmail: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  attendees: yup.array().of(
-    yup.object().shape({
-      name: yup.string().required("Attendee name is required"),
-      age: yup
-        .number()
-        .typeError("Age must be a number")
-        .positive("Age must be positive")
-        .integer("Age must be an integer")
-        .required("Age is required"),
-    })
-  ),
+// Zod Validation Schema
+const schema = z.object({
+  eventName: z.string().nonempty("Event name is required"),
+  organizerEmail: z.string().email("Invalid email format"),
+  attendees: z
+    .array(
+      z.object({
+        name: z.string().nonempty("Attendee name is required"),
+        age: z
+          .number({ invalid_type_error: "Age must be a number" })
+          .positive("Age must be positive")
+          .int("Age must be an integer"),
+      })
+    )
+    .min(1, "At least one attendee is required"),
 });
+
+// Form Data Structure
+type FormData = z.infer<typeof schema>;
 
 const EventRegistrationForm = () => {
   const form = useForm<FormData>({
     defaultValues: {
       eventName: "",
       organizerEmail: "",
-      attendees: [{ name: "", age: 0 }] as { name: string; age: number }[],
+      attendees: [{ name: "", age: 0 }],
     },
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
   });
 
   const { register, control, handleSubmit, formState } = form;
@@ -109,7 +99,9 @@ const EventRegistrationForm = () => {
               <input
                 type="number"
                 placeholder="Attendee Age"
-                {...register(`attendees.${index}.age`)}
+                {...register(`attendees.${index}.age`, {
+                  valueAsNumber: true, // Convert string to number
+                })}
                 className="w-full mb-2 p-2 bg-neutral-100 border border-neutral-300 text-black rounded"
               />
               <p className="text-red-600">
