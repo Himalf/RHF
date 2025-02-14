@@ -1,3 +1,4 @@
+import CustomForm from "./compoents/CustomForm";
 import EventRegistrationForm from "./compoents/EventRegistrationForm";
 import TaskList from "./compoents/TaskList";
 import YoutubeForm from "./compoents/YoutubeForm";
@@ -7,7 +8,8 @@ function App() {
     <main className="">
       {/* <YoutubeForm /> */}
       {/* <TaskList /> */}
-      <EventRegistrationForm />
+      {/* <EventRegistrationForm /> */}
+      <CustomForm />
     </main>
   );
 }
